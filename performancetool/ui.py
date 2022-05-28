@@ -1,4 +1,5 @@
 import sys
+import logging
 
 # Standard Python Imports
 from PyQt5.QtWidgets import QApplication, QPushButton, \
@@ -9,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QPushButton, \
     QHBoxLayout, QRadioButton
 
 # Electromagnetic Ventures LLC Imports
-
+from adb_tools import ADBTools
 # Global Variables
 RESULTS_DIR = "results_dir"
 LOG_DIR = "log_out"
@@ -46,14 +47,15 @@ class App(QWidget):
         self.adb_command_input_label = QLabel("Enter ADB Command")
         self.adb_command = QLineEdit()
         self.dut_serial = QLineEdit()
-        self.execute_command = QPushButton
+        self.execute_command = QPushButton()
         self.device_configuration_tab.layout.addWidget(self.serial_input_label)
         self.device_configuration_tab.layout.addWidget(self.dut_serial)
         self.device_configuration_tab.layout.addWidget(self.adb_command_input_label)
         self.device_configuration_tab.layout.addWidget(self.adb_command)
+        self.device_configuration_tab.layout.addWidget(self.execute_command)
         self.device_serial = self.dut_serial.text()
         self.command = self.adb_command.text()
-        self.execute_command.click.connect(self.on_click)
+        self.execute_command.clicked.connect(self.on_click)
         self.device_configuration_tab.setLayout(self.device_configuration_tab.layout)
 
         # Set up ADB Tools Tab
@@ -83,8 +85,16 @@ class Worker():
         self.adb_command = adb_command
         self.serial = device_serial
 
+    def setup_adb_routine(self):
+        """Setup ADB routine"""
+        android_perf = ADBTools(self.adb_command, self.serial)
 
+        return android_perf
 
+    def run(self):
+
+           run_android_routine = self.setup_adb_routine()
+           run_android_routine.adb_command()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
